@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact · Mst. Sazia Tahosin</title>
+<meta name="description" content="Contact Mst. Sazia Tahosin for research collaborations.">
+<meta property="og:title" content="Mst. Sazia Tahosin · AI for Medical Imaging & Health">
+<meta property="og:description" content="MRes researcher at UniSQ. Explainable and federated AI for medical imaging.">
+<meta property="og:image" content="assets/logo.svg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="page-head">
+  <div class="gridlines"></div>
+  <div class="wrap">
+    <p class="kicker">Contact</p>
+    <h1>Let’s <span class="grad-text">talk research</span>.</h1>
+    <p class="sub">I’m open to collaborations, co-authorship and conversations about AI for health and medical imaging. Email is the best way to reach me.</p>
+  </div>
+</header>
+<section class="s" style="padding-top:10px">
+  <div class="wrap">
+    <div class="contact-grid" id="cg"></div>
+    <div class="cta-band reveal" style="margin-top:56px">
+      <p class="kicker" style="justify-content:center">Based in</p>
+      <h2>Queensland, Australia</h2>
+      <p>University of Southern Queensland</p>
+      <div class="btns"><a class="btn primary" id="mailbtn">Send an email</a></div>
+    </div>
+  </div>
+</section>
+
+<script src="assets/main.js"></script>
+<script src="assets/pubs.js"></script>
+<script>
+const items = [
+  ["Email", PROFILE.email, "mailto:"+PROFILE.email, ICONS.mail],
+  ["Google Scholar", "Citations & papers", PROFILE.scholar, ICONS.scholar],
+  ["ORCID", "0009-0006-2027-7148", PROFILE.orcid, ICONS.orcid],
+  ["ResearchGate", "Mst-Sazia-Tahosin", PROFILE.researchgate, ICONS.rg],
+  ["LinkedIn", "in/saziatahosin", PROFILE.linkedin, ICONS.linkedin],
+  ["GitHub", "github.com/saziatahosin", PROFILE.github, ICONS.github]
+];
+document.getElementById("cg").innerHTML = items.map(([t,s,h,ic],i) => `<a class="cl reveal ${i%3?'d'+(i%3):''}" href="${h}" ${h.startsWith("mailto")?"":'target="_blank" rel="noopener"'}><span class="ic">${ic}</span><span><b>${t}</b><span>${s}</span></span><span class="go">${ICONS.arrow.replace('<svg','<svg width="18" height="18"')}</span></a>`).join("");
+document.getElementById("mailbtn").href = "mailto:"+PROFILE.email;
+observeReveals();
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publications · Mst. Sazia Tahosin</title>
+<meta name="description" content="Publications of Mst. Sazia Tahosin, with live citation counts from OpenAlex.">
+<meta property="og:title" content="Mst. Sazia Tahosin · AI for Medical Imaging & Health">
+<meta property="og:description" content="MRes researcher at UniSQ. Explainable and federated AI for medical imaging.">
+<meta property="og:image" content="assets/logo.svg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="page-head" style="padding-bottom:40px">
+  <div class="gridlines"></div>
+  <div class="wrap">
+    <p class="kicker">Publications</p>
+    <h1>Papers &amp; <span class="grad-text">citations</span></h1>
+    <p class="sub">Peer-reviewed journal articles, conference papers and book chapters. The list and citation counts update automatically from OpenAlex.</p>
+  </div>
+</header>
+<section class="s" style="padding-top:0">
+  <div class="wrap">
+    <div class="stats reveal" style="margin-bottom:12px">
+      <div class="stat"><small>LIVE</small><b id="st-cites">574</b><span>Citations</span></div>
+      <div class="stat"><small>LIVE</small><b id="st-h">13</b><span>h-index</span></div>
+      <div class="stat"><small>LIVE</small><b id="st-i10">14</b><span>i10-index</span></div>
+      <div class="stat"><small>LIVE</small><b id="st-works">19</b><span>Published works</span></div>
+    </div>
+    <p class="sync-note" id="sync" style="margin-bottom:30px">Connecting to OpenAlex…</p>
+    <div class="chart-wrap reveal" id="chartBox" hidden>
+      <h3>Citations per year</h3><p>Live from OpenAlex</p>
+      <div class="bars" id="bars"></div>
+    </div>
+    <div class="pub-bar" role="group" aria-label="Filter publications">
+      <button class="chip" data-f="all" aria-pressed="true">All<span class="c" data-c="all"></span></button>
+      <button class="chip" data-f="journal" aria-pressed="false">Journal<span class="c" data-c="journal"></span></button>
+      <button class="chip" data-f="conference" aria-pressed="false">Conference<span class="c" data-c="conference"></span></button>
+      <button class="chip" data-f="chapter" aria-pressed="false">Chapter<span class="c" data-c="chapter"></span></button>
+      <button class="chip" data-f="first" aria-pressed="false">★ First author<span class="c" data-c="first"></span></button>
+      <button class="chip" data-f="review" aria-pressed="false">Under review<span class="c" data-c="review"></span></button>
+      <input id="q" type="search" placeholder="Search title, venue, co-author…" aria-label="Search">
+      <select id="sort" aria-label="Sort"><option value="year">Newest first</option><option value="cites">Most cited</option></select>
+    </div>
+    <div id="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+    <p class="sync-note" style="margin-top:28px">Citation counts come from <a href="https://openalex.org" target="_blank" rel="noopener" style="color:var(--teal)">OpenAlex</a> and may differ slightly from Google Scholar. See also my <a id="gs" target="_blank" rel="noopener" style="color:var(--teal)">Google Scholar profile</a>.</p>
+  </div>
+</section>
+
+<script src="assets/main.js"></script>
+<script src="assets/pubs.js"></script>
+<script>
+document.getElementById("gs").href = PROFILE.scholar;
+let DATA = [], VIEW = [], filter = "all", q = "", sort = "year", firstLoad = true;
+const match = p => (filter==="all" || (filter==="first" ? isFirst(p) && p.type!=="review" : p.type===filter)) &&
+  (!q || (p.title+" "+p.venue+" "+p.authors.join(" ")).toLowerCase().includes(q));
+
+function source(p){
+  if(p.type==="review") return `<span style="color:var(--amber)">Manuscript under review</span>`;
+  let s = (p.type==="chapter" ? "In " : "") + `<i>${esc(p.venue)}</i>`;
+  if(p.volume) s += `, ${esc(p.volume)}`;
+  if(p.issue) s += `(${esc(p.issue)})`;
+  if(p.pages) s += `, ${esc(p.pages)}`;
+  return s + `, ${p.year}.`;
+}
+function entry(p, n){
+  const id = "p"+n;
+  return `<article class="entry reveal" id="${id}">
+    <div class="idx">[${n}]</div>
+    <div>
+      <h3 class="t">${p.doi?`<a href="https://doi.org/${p.doi}" target="_blank" rel="noopener">${esc(p.title)}</a>`:esc(p.title)}</h3>
+      <p class="au">${authorsHtml(p.authors, 30)}</p>
+      <p class="src">${source(p)}</p>
+      <div class="acts">
+        <span class="badge b-${p.type}">${LABEL[p.type]}</span>${isFirst(p)&&p.type!=="review"?'<span class="badge b-first">First author</span>':''}
+        ${p.abstract?`<button class="act" data-panel="abs" aria-expanded="false">Abstract</button>`:""}
+        ${p.type!=="review"?`<button class="act" data-panel="cite" aria-expanded="false">Cite</button>`:""}
+        ${p.doi?`<a class="act" href="https://doi.org/${p.doi}" target="_blank" rel="noopener">DOI</a>`:""}
+        ${p.oa?`<a class="act oa" href="${esc(p.oa)}" target="_blank" rel="noopener">Open access PDF ↗</a>`:""}
+      </div>
+      ${p.abstract?`<div class="panel" data-for="abs">${esc(p.abstract)}</div>`:""}
+      ${p.type!=="review"?`<div class="panel" data-for="cite">
+        <div class="row"><h5>APA 7</h5><button class="act" data-copy="apa">Copy</button></div><pre data-src="apa">${apa(p)}</pre>
+        <div class="row"><h5>BIBTEX</h5><button class="act" data-copy="bib">Copy</button></div><pre data-src="bib">${esc(bibtex(p))}</pre>
+      </div>`:""}
+    </div>
+    <div class="cb">${p.cites!=null?`<b>${p.cites}</b><span>CITED BY</span>`:""}</div>
+  </article>`;
+}
+function draw(){
+  VIEW = DATA.filter(match);
+  document.querySelectorAll("[data-c]").forEach(el => { const f = el.dataset.c; el.textContent = DATA.filter(p => f==="all" ? true : f==="first" ? isFirst(p)&&p.type!=="review" : p.type===f).length; });
+  const list = document.getElementById("list");
+  if(!VIEW.length){ list.innerHTML = '<p style="color:var(--muted);padding:30px 0">No papers match.</p>'; return; }
+  // numbering: oldest published = [1], like an academic CV
+  const published = DATA.filter(p => p.type!=="review").slice().sort((a,b)=> a.year-b.year || a.title.localeCompare(b.title));
+  const num = p => p.type==="review" ? "R"+(DATA.filter(x=>x.type==="review").indexOf(p)+1) : published.indexOf(p)+1;
+  if(sort==="cites"){
+    list.innerHTML = VIEW.slice().sort((a,b)=>(b.cites??-1)-(a.cites??-1)).map(p => entry(p, num(p))).join("");
+  } else {
+    const groups = {};
+    VIEW.forEach(p => { const k = p.type==="review" ? "Under review" : String(p.year); (groups[k]=groups[k]||[]).push(p); });
+    const keys = Object.keys(groups).sort((a,b)=> a==="Under review"?-1 : b==="Under review"?1 : b-a);
+    list.innerHTML = keys.map(k => `<div class="yr">${k}</div>` + groups[k].sort((a,b)=> num(b)>num(a)?1:-1).map(p => entry(p, num(p))).join("")).join("");
+  }
+  observeReveals(list);
+}
+// abstract / cite toggles and copy buttons
+document.getElementById("list").addEventListener("click", e => {
+  const t = e.target.closest("button"); if(!t) return;
+  const card = t.closest(".entry");
+  if(t.dataset.panel){
+    const panel = card.querySelector(`.panel[data-for="${t.dataset.panel}"]`), open = !panel.classList.contains("open");
+    card.querySelectorAll(".panel").forEach(p => p.classList.remove("open"));
+    card.querySelectorAll("[data-panel]").forEach(b => b.setAttribute("aria-expanded","false"));
+    if(open){ panel.classList.add("open"); t.setAttribute("aria-expanded","true"); }
+  }
+  if(t.dataset.copy){
+    const text = card.querySelector(`pre[data-src="${t.dataset.copy}"]`).textContent;
+    const done = () => { t.textContent = "Copied ✓"; t.classList.add("copied"); setTimeout(()=>{ t.textContent="Copy"; t.classList.remove("copied"); }, 1600); };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => {});
+    else { const ta = document.createElement("textarea"); ta.value = text; document.body.append(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(_){} ta.remove(); }
+  }
+});
+function chart(byYear){
+  const box = document.getElementById("chartBox");
+  const rows = (byYear||[]).filter(r => r.cites>0 || r.works>0).sort((a,b)=>a.year-b.year);
+  if(rows.length < 2){ box.hidden = true; return; }
+  const max = Math.max(...rows.map(r => r.cites), 1);
+  document.getElementById("bars").innerHTML = rows.map((r,i) => `<div class="bar"><b>${r.cites}</b><i style="height:${Math.max(4, r.cites/max*110)}px;animation-delay:${i*.08}s"></i><span>${r.year}</span></div>`).join("");
+  box.hidden = false; box.classList.add("in");
+}
+document.querySelectorAll(".chip").forEach(b => b.onclick = () => { document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); filter=b.dataset.f; draw(); });
+document.getElementById("q").oninput = e => { q = e.target.value.trim().toLowerCase(); draw(); };
+document.getElementById("sort").onchange = e => { sort = e.target.value; draw(); };
+loadPublications((d, mode) => {
+  DATA = d.pubs; draw();
+  const s = d.stats, set=(id,v)=>{ if(v==null) return; const el=document.getElementById(id); el.dataset.from = firstLoad?0:(parseInt(el.textContent.replace(/,/g,""))||0); countTo(el,v); };
+  set("st-cites",s.citations); set("st-h",s.h); set("st-i10",s.i10); set("st-works",s.works); firstLoad=false;
+  chart(s.byYear);
+  document.getElementById("sync").textContent = syncLabel(mode, d.at);
+});
+</script>
+
+</body>
+</html>
